@@ -118,7 +118,6 @@ int main(void){	// First version : Source code on standard input and assembly co
 	// Let's proceed to the analysis and code production
 	nextcar = cin.get();
 	Expression();
-	ReadChar();
 	// Récupérer le résultat final pour le retour
 	cout << "\tpop %rax\t\t# Récupérer le résultat pour le code de retour" << endl;
 	// Trailer for the gcc assembler / linker
