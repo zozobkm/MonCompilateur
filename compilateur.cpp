@@ -107,6 +107,8 @@ int main(void){	// First version : Source code on standard input and assembly co
 	ReadChar();
 	ArithmeticExpression();
 	ReadChar();
+	// Récupérer le résultat final pour le retour
+	cout << "\tpop %rax\t\t# Récupérer le résultat pour le code de retour" << endl;
 	// Trailer for the gcc assembler / linker
 	cout << "\tmovq %rbp, %rsp\t\t# Restore the position of the stack's top"<<endl;
 	cout << "\tret\t\t\t# Return from main function"<<endl;
