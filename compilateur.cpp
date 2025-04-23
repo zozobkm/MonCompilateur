@@ -117,7 +117,6 @@ int main(void){	// First version : Source code on standard input and assembly co
 
 	// Let's proceed to the analysis and code production
 	nextcar = cin.get();
-	ReadChar();
 	Expression();
 	ReadChar();
 	// Récupérer le résultat final pour le retour
