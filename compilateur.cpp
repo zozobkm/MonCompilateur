@@ -25,11 +25,10 @@
 using namespace std;
 
 char current;				// Current car	
-
-void ReadChar(void){		// Read character and skip spaces until 
-				// non space character is read
-	while(cin.get(current) && (current==' '||current=='\t'||current=='\n'))
-	   	cin.get(current);
+char nextcar;			 // Pour anticiper deux caractères
+void ReadChar() {
+    current = nextcar;
+    while (cin.get(nextcar) && (nextcar == ' ' || nextcar == '\t' || nextcar == '\n'));
 }
 
 void Error(string s){
@@ -76,25 +75,38 @@ void Term(void){
 	     	else
 			Error("'(' ou chiffre attendu");
 }
-
-void ArithmeticExpression(void){
-	char adop;
-	Term();
-	while(current=='+'||current=='-'){
-		adop=current;		// Save operator in local variable
-		AdditiveOperator();
-		Term();
-		cout << "\tpop %rbx"<<endl;	// get first operand
-		cout << "\tpop %rax"<<endl;	// get second operand
-		if(adop=='+')
-			cout << "\taddq	%rbx, %rax"<<endl;	// add both operands
-		else
-			cout << "\tsubq	%rbx, %rax"<<endl;	// substract both operands
-		cout << "\tpush %rax"<<endl;			// store result
-	}
-
+string OpRel() {
+    string op;
+    if(current == '=')
+    {
+        op = "sete"; ReadChar();
+    }
+    else if(current == '<') {
+        if(nextcar == '>') { op = "setne"; ReadChar(); ReadChar(); }
+        else if(nextcar == '=') { op = "setle"; ReadChar(); ReadChar(); }
+        else { op = "setl"; ReadChar(); }
+    }
+    else if(current == '>') {
+        if(nextcar == '=') { op = "setge"; ReadChar(); ReadChar(); }
+        else { op = "setg"; ReadChar(); }
+    }
+    else Error("Opérateur relationnel attendu");
+    return op;
 }
+void Expression() {
+    ArithmeticExpression();  // lit le 1er terme
 
+    if(current == '=' || current == '<' || current == '>') {
+        cout << "\tpop %rbx" << endl;
+        cout << "\tpop %rax" << endl;
+        cout << "\tcmp %rbx, %rax" << endl;
+
+        string cond = OpRel();
+        cout << "\t" << cond << " %al" << endl;
+        cout << "\tmovzbq %al, %rax" << endl;  // étend le booléen 0/1 en 64 bits
+        cout << "\tpush %rax" << endl;
+    }
+}
 int main(void){	// First version : Source code on standard input and assembly code on standard output
 	// Header for gcc assembler / linker
 	cout << "\t\t\t# This code was produced by the CERI Compiler"<<endl;
@@ -104,8 +116,9 @@ int main(void){	// First version : Source code on standard input and assembly co
 	cout << "\tmovq %rsp, %rbp\t# Save the position of the stack's top"<<endl;
 
 	// Let's proceed to the analysis and code production
+	nextcar = cin.get();
 	ReadChar();
-	ArithmeticExpression();
+	Expression();
 	ReadChar();
 	// Récupérer le résultat final pour le retour
 	cout << "\tpop %rax\t\t# Récupérer le résultat pour le code de retour" << endl;
