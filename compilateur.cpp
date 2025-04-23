@@ -123,10 +123,14 @@ int main(void){	// First version : Source code on standard input and assembly co
 	// Trailer for the gcc assembler / linker
 	cout << "\tmovq %rbp, %rsp\t\t# Restore the position of the stack's top"<<endl;
 	cout << "\tret\t\t\t# Return from main function"<<endl;
-	if(cin.get(current)){
-		cerr <<"Caractères en trop à la fin du programme : ["<<current<<"]";
-		Error("."); // unexpected characters at the end of program
+	// Vérifier qu'il ne reste que des espaces ou retours à la fin
+	while (cin.get(current)) {
+		if (current != ' ' && current != '\t' && current != '\n') {
+			cerr <<"Caractères en trop à la fin du programme : ["<<current<<"]";
+			Error(".");
+		}
 	}
+
 
 }
 		
